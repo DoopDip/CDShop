@@ -25,11 +25,11 @@
                 </li>
             </ul>
             <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" id="inputCdName"
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" id="inputSearchCdName"
                        aria-label="Search">
-                <button class="btn btn-outline-light my-2 my-sm-0" type="submit" onclick="pageReload(STATUS_SEARCH)">
+                <a class="btn btn-outline-light my-2 my-sm-0 text-white" onclick="pageReload(STATUS_SEARCH)">
                     Search
-                </button>
+                </a>
             </form>
         </div>
     </div>
@@ -64,34 +64,34 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+
             <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="inputNewName" class="bmd-label-floating">Name</label>
-                        <input type="text" class="form-control" id="inputNewName">
-                        <span class="bmd-help">Please enter name cd</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputNewPrice" class="bmd-label-floating">Price</label>
-                        <input type="number" class="form-control" id="inputNewPrice">
-                        <span class="bmd-help">Please enter price</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputNewType" class="bmd-label-floating">Type</label>
-                        <input type="text" class="form-control" id="inputNewType">
-                        <span class="bmd-help">Please enter type</span>
-                    </div>
-                    <div class="form-group">
-                        <label for="inputNewStock" class="bmd-label-floating">Stock</label>
-                        <input type="number" class="form-control" id="inputNewStock">
-                        <span class="bmd-help">Please enter stock</span>
-                    </div>
-                </form>
+                <div class="form-group">
+                    <label for="inputNewName" class="bmd-label-floating">Name</label>
+                    <input type="text" class="form-control" id="inputNewName">
+                    <span class="bmd-help">Please enter name cd</span>
+                </div>
+                <div class="form-group">
+                    <label for="inputNewPrice" class="bmd-label-floating">Price</label>
+                    <input type="number" class="form-control" id="inputNewPrice">
+                    <span class="bmd-help">Please enter price</span>
+                </div>
+                <div class="form-group">
+                    <label for="inputNewType" class="bmd-label-floating">Type</label>
+                    <input type="text" class="form-control" id="inputNewType">
+                    <span class="bmd-help">Please enter type</span>
+                </div>
+                <div class="form-group">
+                    <label for="inputNewStock" class="bmd-label-floating">Stock</label>
+                    <input type="number" class="form-control" id="inputNewStock">
+                    <span class="bmd-help">Please enter stock</span>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Insert</button>
+                <button type="submit" class="btn btn-primary" onclick="insertCd()" data-dismiss="modal">Insert</button>
             </div>
+
         </div>
     </div>
 </div>
@@ -136,7 +136,7 @@
 
             });
         } else if (status === STATUS_SEARCH) {
-            var input = $('#inputCdName').val();
+            var input = $('#inputSearchCdName').val();
             if (input !== "") {
                 $.ajax({
                     url: 'http://localhost:3000/api/cds/' + input
@@ -172,6 +172,20 @@
                 });
             }
         }
+    }
+
+    function insertCd() {
+        var name = $('#inputNewName').val();
+        var price = $('#inputNewPrice').val();
+        var stock = $('#inputNewStock').val();
+        var type = $('#inputNewType').val();
+        $.ajax({
+            type: "POST",
+            url: 'http://localhost:3000/api/add',
+            data: {cd: {name: name, price: price, stock: stock, type: type}},
+        }).done(function (json) {
+            pageReload(STATUS_HOME);
+        });
     }
 </script>
 </body>
