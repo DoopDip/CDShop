@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+    <link rel="stylesheet"
+          href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css"
+          integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+    <title>CD - Shop</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="#" onclick="pageReload(STATUS_HOME)">[CD Shop]</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#exampleModalCenter">Insert</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" id="inputCdName"
+                       aria-label="Search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit" onclick="pageReload(STATUS_SEARCH)">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">NAME</th>
+                <th scope="col">PRICE</th>
+                <th scope="col">TYPE</th>
+                <th scope="col">STOCK</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody id="item-body">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Insert new CD</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="inputNewName" class="bmd-label-floating">Name</label>
+                        <input type="text" class="form-control" id="inputNewName">
+                        <span class="bmd-help">Please enter name cd</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNewPrice" class="bmd-label-floating">Price</label>
+                        <input type="number" class="form-control" id="inputNewPrice">
+                        <span class="bmd-help">Please enter price</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNewType" class="bmd-label-floating">Type</label>
+                        <input type="text" class="form-control" id="inputNewType">
+                        <span class="bmd-help">Please enter type</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNewStock" class="bmd-label-floating">Stock</label>
+                        <input type="number" class="form-control" id="inputNewStock">
+                        <span class="bmd-help">Please enter stock</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js"
+        integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.rawgit.com/FezVrasta/snackbarjs/1.1.0/dist/snackbar.min.js"></script>
+<script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js"
+        integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9"
+        crossorigin="anonymous"></script>
+<script>
+
+    var STATUS_HOME = 0;
+    var STATUS_SEARCH = 1;
+
+    $(document).ready(function () {
+        $('body').bootstrapMaterialDesign();
+        pageReload(STATUS_HOME);
+    });
+
+
+    function pageReload(status) {
+        status = parseInt(status);
+        if (status === STATUS_HOME) {
+            $.ajax({
+                url: 'http://localhost:3000/api/cds/'
+            }).done(function (json) {
+                var html = "";
+                json.forEach(function (item) {
+                    //console.log(item);
+                    html += "<tr>" +
+                        " <th scope=\"row\">" + item.name + "</th>" +
+                        "<td>" + item.price + "</td>" +
+                        "<td>" + item.type + "</td>" +
+                        "<td>" + item.stock + "</td>" +
+                        "<td class=\"text-center\"><button class=\"btn btn-outline-secondary\">Buy</button></td>" +
+                        "</tr>";
+                    $('#item-body').html(html);
+                });
+
+            });
+        } else if (status === STATUS_SEARCH) {
+            var input = $('#inputCdName').val();
+            if (input !== "") {
+                $.ajax({
+                    url: 'http://localhost:3000/api/cds/' + input
+                }).done(function (json) {
+                    var html = "";
+                    console.log(json);
+                    if (!$.isEmptyObject(json)) {
+                        json.forEach(function (item) {
+                            html += "<tr>" +
+                                " <th scope=\"row\">" + item.name + "</th>" +
+                                "<td>" + item.price + "</td>" +
+                                "<td>" + item.type + "</td>" +
+                                "<td>" + item.stock + "</td>" +
+                                "<td class=\"text-center\"><button class=\"btn btn-outline-secondary\">Buy</button></td>" +
+                                "</tr>";
+                            $('#item-body').html(html);
+                        });
+                    } else {
+                        $.snackbar({
+                            content: "ไม่มีข้อมูลซีดี [ " + input + " ]",
+                            style: "snackbar",
+                            timeout: 3000,
+                            htmlAllowed: true
+                        });
+                    }
+                });
+            } else {
+                $.snackbar({
+                    content: "กรุณาใส่ชื่อซีดีที่ต้องการค้นหา",
+                    style: "snackbar",
+                    timeout: 3000,
+                    htmlAllowed: true
+                });
+            }
+        }
+    }
+</script>
+</body>
+</html>
