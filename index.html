@@ -105,7 +105,6 @@
         integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9"
         crossorigin="anonymous"></script>
 <script>
-
     var STATUS_HOME = 0;
     var STATUS_SEARCH = 1;
 
@@ -114,22 +113,22 @@
         pageReload(STATUS_HOME);
     });
 
-
     function pageReload(status) {
         status = parseInt(status);
         if (status === STATUS_HOME) {
             $.ajax({
-                url: 'http://localhost:3000/api/cds/'
+                url: '/api/cds/'
             }).done(function (json) {
                 var html = "";
                 json.forEach(function (item) {
-                    //console.log(item);
                     html += "<tr>" +
                         " <th scope=\"row\">" + item.name + "</th>" +
                         "<td>" + item.price + "</td>" +
                         "<td>" + item.type + "</td>" +
                         "<td>" + item.stock + "</td>" +
-                        "<td class=\"text-center\"><button class=\"btn btn-outline-secondary\">Buy</button></td>" +
+                        "<td class=\"text-center\">" +
+                        "<button class=\"btn btn-outline-secondary\" onclick=\"buyCd(\'" + item._id + "\'," + item.stock + ",STATUS_HOME)\">Buy</button>" +
+                        "</td>" +
                         "</tr>";
                     $('#item-body').html(html);
                 });
@@ -139,7 +138,7 @@
             var input = $('#inputSearchCdName').val();
             if (input !== "") {
                 $.ajax({
-                    url: 'http://localhost:3000/api/cds/' + input
+                    url: '/api/cds/' + input
                 }).done(function (json) {
                     var html = "";
                     console.log(json);
@@ -150,7 +149,9 @@
                                 "<td>" + item.price + "</td>" +
                                 "<td>" + item.type + "</td>" +
                                 "<td>" + item.stock + "</td>" +
-                                "<td class=\"text-center\"><button class=\"btn btn-outline-secondary\">Buy</button></td>" +
+                                "<td class=\"text-center\">" +
+                                "<button class=\"btn btn-outline-secondary\" onclick=\"buyCd(\'" + item._id + "\'," + item.stock + ",STATUS_SEARCH)\">Buy</button>" +
+                                "</td>" +
                                 "</tr>";
                             $('#item-body').html(html);
                         });
@@ -174,6 +175,32 @@
         }
     }
 
+    function buyCd(id, total, status) {
+        total--;
+        if (total >= 0) {
+            $.ajax({
+                type: "POST",
+                url: '/api/buy',
+                data: {cd: {id: id, total: total}},
+            }).done(function (json) {
+                pageReload(status);
+                $.snackbar({
+                    content: "ซื้อสินค้าเรียบร้อยแล้ว",
+                    style: "snackbar",
+                    timeout: 1000,
+                    htmlAllowed: true
+                });
+            });
+        } else {
+            $.snackbar({
+                content: "ไม่มีสินค้า",
+                style: "snackbar",
+                timeout: 1000,
+                htmlAllowed: true
+            });
+        }
+    }
+
     function insertCd() {
         var name = $('#inputNewName').val();
         var price = $('#inputNewPrice').val();
@@ -181,7 +208,7 @@
         var type = $('#inputNewType').val();
         $.ajax({
             type: "POST",
-            url: 'http://localhost:3000/api/add',
+            url: '/api/add',
             data: {cd: {name: name, price: price, stock: stock, type: type}},
         }).done(function (json) {
             pageReload(STATUS_HOME);
